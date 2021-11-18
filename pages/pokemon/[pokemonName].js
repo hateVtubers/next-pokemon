@@ -3,18 +3,23 @@ import HeadContainer from "../../containers/HeadContainer";
 import { Card } from "../../components/Card";
 
 const Name = ({ name, id, versions }) => {
-  /* [...[generationName, [...[gameName, [images]]]] */
-  const pokemonData = Object.entries(versions).map(
-    ([generationName, gameName]) => {
+  /* pokemonData = [...[generationName, [...[gameName, [images]]]] */
+  const pokemonData = Object.entries(versions)
+    .map(([generationName, gameName]) => {
+      /* a = [gameName, [image]] */
       const a = Object.entries(gameName).map(([gn, img]) => {
         // gn = gameName
         const gnImg = Object.values(img); // img(Objects)
         const filterImages = gnImg.filter((i) => i && typeof i === "string");
         return [gn, filterImages];
       });
-      return [generationName, a];
-    }
-  );
+      /* delete object with null of api */
+      return a.every(([game, images]) => images.length > 0)
+        ? [generationName, a]
+        : null;
+    })
+    .filter((i) => i); /* filter return null of array */
+
   return (
     <>
       <HeadContainer></HeadContainer>
@@ -24,10 +29,17 @@ const Name = ({ name, id, versions }) => {
           <h1 className="text-lg text-center">{name.toUpperCase()}</h1>
           <h2 className="text-xs text-center mb-2">pokedex number {id}</h2>
         </header>
-        <main className={`grid grid-cols-${pokemonData.length} place-items-center gap-3`}>
+        <main
+          className={`grid grid-cols-${pokemonData.length} place-items-center gap-3`}
+        >
           {pokemonData.map(([generationName, assets]) => (
-            <div className="bg-black w-11/12 py-2 px-3 rounded" key={generationName}>
-              <h3 className="text-center text-sm">{generationName.toUpperCase()}</h3>
+            <div
+              className="bg-black w-11/12 py-2 px-3 rounded"
+              key={generationName}
+            >
+              <h3 className="text-center text-sm">
+                {generationName.toUpperCase()}
+              </h3>
               <div className="flex items-center justify-evenly gap-4 flex-wrap py-2">
                 {assets.map(([title, image]) => (
                   <Card title={title} imageArray={image} key={title}></Card>
