@@ -22,7 +22,7 @@ const Name = ({ name, id, versions }) => {
       <main className="mt-10 mb-5 bg-crimson-500 py-2 px-3 text-white w-11/12 mx-auto rounded max-w-xl lg:max-w-3xl">
         <header>
           <h1 className="text-lg text-center">{name.toUpperCase()}</h1>
-          <h2 className="text-xs text-center">{id}</h2>
+          <h2 className="text-xs text-center mb-2">pokedex number {id}</h2>
         </header>
         <main className={`grid grid-cols-${pokemonData.length} place-items-center gap-3`}>
           {pokemonData.map(([generationName, assets]) => (

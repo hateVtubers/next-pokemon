@@ -1,13 +1,23 @@
+import { useState } from "react";
 import HeadContainer from "../containers/HeadContainer";
 import HeaderContainer from "../containers/HeaderContainer";
-import { useGeneration } from "../hooks/useGeneration";
 import { Text } from "../components/Text";
 
-const Home = ({ pokemon_species }) => {
-  const { generation, generationName, setLoading, loading } = useGeneration(pokemon_species);
+const generationName = [
+  "GENERATION I",
+  "GENERATION II",
+  "GENERATION III",
+  "GENERATION IV",
+  "GENERATION V",
+  "GENERATION VI",
+  "GENERATION VII",
+  "GENERATION VIII",
+];
 
+const Home = ({ pokemonNames }) => {
+  const [generation, setGeneration] = useState(generationName[0]);
   const handleState = (event) => {
-    setLoading(event.target.value);
+    setGeneration(event.target.value);
   };
   return (
     <>
@@ -28,11 +38,9 @@ const Home = ({ pokemon_species }) => {
           ))}
         </select>
         <section className="rounded-b bg-black text-white p-3 lg:px-4 w-11/12 max-w-lg lg:max-w-2xl text-xs lg:text-sm flex flex-wrap gap-2 lg:gap-2.5 items-center justify-center">
-          {loading
-            ? generation.map(({ name }) => <Text name={name} key={name}></Text>)
-            : pokemon_species.map(({ name }) => (
-                <Text name={name} key={name}></Text>
-              ))}
+          {pokemonNames[generationName.indexOf(generation)].map((name) => (
+            <Text name={name} key={name}></Text>
+          ))}
         </section>
       </main>
     </>
@@ -40,13 +48,19 @@ const Home = ({ pokemon_species }) => {
 };
 
 export const getStaticProps = async () => {
-  const res = await fetch("https://pokeapi.co/api/v2/generation/1/").then((r) =>
-    r.json()
+  const res = await Promise.all(
+    generationName.map((v, i) =>
+      fetch(`https://pokeapi.co/api/v2/generation/${++i}/`).then((res) =>
+        res.json()
+      )
+    )
   );
-  const { pokemon_species } = res;
+  const pokemonNames = res.map(({ pokemon_species }) =>
+    pokemon_species.map(({ name }) => name)
+  );
   return {
     props: {
-      pokemon_species,
+      pokemonNames,
     },
   };
 };
